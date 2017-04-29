@@ -1,46 +1,30 @@
 package hello.model;
 
 public class Forecast {
-    private long eventId;
     private int minute;
     private Result result;
     private double coefficient;
     private double betSum;
     private boolean isCompleted;
     private boolean isWinning;
-    private String location;
-    private String competition;
-    private int score1;
-    private int score2;
+    private Match match;
 
-    public Forecast(long eventId, int minute, Result result, double coefficient, double betSum) {
-        this.eventId = eventId;
+    public Forecast(Match match, int minute, Result result, double coefficient, double betSum) {
+        this.match = match;
         this.minute = minute;
         this.result = result;
         this.coefficient = coefficient;
         this.betSum = betSum;
     }
 
-    public Forecast(String location, String competition, int score1, int score2, long eventId, int minute, Result result, double coefficient, double betSum, boolean isCompleted, boolean isWinning) {
-        this.location = location;
-        this.competition = competition;
-        this.score1 = score1;
-        this.score2 = score2;
-        this.eventId = eventId;
+    public Forecast(Match match, int minute, Result result, double coefficient, double betSum, boolean isCompleted, boolean isWinning) {
+        this.match = match;
         this.minute = minute;
         this.result = result;
         this.coefficient = coefficient;
         this.betSum = betSum;
         this.isCompleted = isCompleted;
         this.isWinning = isWinning;
-    }
-
-    public long getEventId() {
-        return eventId;
-    }
-
-    public void setEventId(long eventId) {
-        this.eventId = eventId;
     }
 
     public int getMinute() {
@@ -91,35 +75,43 @@ public class Forecast {
         isWinning = winning;
     }
 
-    public String getLocation() {
-        return location;
+    public Match getMatch() {
+        return match;
     }
 
-    public void setLocation(String location) {
-        this.location = location;
+    public void setMatch(Match match) {
+        this.match = match;
     }
 
-    public String getCompetition() {
-        return competition;
-    }
+    public double check(int currentMinute) {
 
-    public void setCompetition(String competition) {
-        this.competition = competition;
-    }
+        StatisticsRowHolder row = this.match.getDetails().get(currentMinute - 1);
+        Forecast forecast = this;
 
-    public int getScore1() {
-        return score1;
-    }
+        if (row.isTeam1Scored()) {
+            forecast.setCompleted(true);
+            if (forecast.getResult() == Result.TEAM_1_SCORED) {
+                forecast.setWinning(true);
+                return forecast.getCoefficient() * forecast.getBetSum();
+            } else {
+                forecast.setWinning(false);
+                return 0;
+            }
+        } else if (row.isTeam2Scored()) {
+            forecast.setCompleted(true);
+            if (forecast.getResult() == Result.TEAM_2_SCORED) {
+                forecast.setWinning(true);
+                return forecast.getCoefficient() * forecast.getBetSum();
+            } else {
+                forecast.setWinning(false);
+                return 0;
+            }
+        } else if (row.getScoreTime() == 90 && forecast.getResult() == Result.TEAM_X_SCORED) {
+            forecast.setCompleted(true);
+            forecast.setWinning(true);
+            return forecast.getCoefficient() * forecast.getBetSum();
+        }
 
-    public void setScore1(int score1) {
-        this.score1 = score1;
-    }
-
-    public int getScore2() {
-        return score2;
-    }
-
-    public void setScore2(int score2) {
-        this.score2 = score2;
+        return 0;
     }
 }

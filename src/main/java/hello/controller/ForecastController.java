@@ -53,8 +53,6 @@ public class ForecastController {
                     int favoriteScore;
                     int outsiderScore;
 
-//                  + 204
-
                     Result favoriteScored;
 
                     if (row.getNextGoal1Coef() > row.getNextGoal2Coef()) {
@@ -72,27 +70,27 @@ public class ForecastController {
                     }
 
                     if (favoriteCoefficient > 2.3 && scoreTime > 45 && scoreTime < 50 && favoriteScore == 0 && outsiderScore == 0) {
-                        forecast = new Forecast(match.getId(), scoreTime, favoriteScored, favoriteCoefficient, betSum);
+                        forecast = new Forecast(match, scoreTime, favoriteScored, favoriteCoefficient, betSum);
                         total -= betSum;
                         betNumber++;
                     }
                 } else {
-                    double increment = match.checkForecast(forecast, row.getScoreTime());
+                    double increment = forecast.check(row.getScoreTime());
+
                     total += increment;
 
                     if (forecast.isCompleted()) {
                         i = i - 1;
-                        forecastsHistory.add(new Forecast(match.getLocation(), match.getChampionship(), row.getScore1(), row.getScore2(), forecast.getEventId(), forecast.getMinute(), forecast.getResult(), forecast.getCoefficient(), forecast.getBetSum(), forecast.isCompleted(), forecast.isWinning()));
+                        forecastsHistory.add(new Forecast(forecast.getMatch(), forecast.getMinute(), forecast.getResult(), forecast.getCoefficient(), forecast.getBetSum(), forecast.isCompleted(), forecast.isWinning()));
                         forecast = null;
                     } else if (row.getScoreTime() == 90) {
                         //forecast.setCompleted(true);
-                        forecastsHistory.add(new Forecast(match.getLocation(), match.getChampionship(), row.getScore1(), row.getScore2(), forecast.getEventId(), forecast.getMinute(), forecast.getResult(), forecast.getCoefficient(), forecast.getBetSum(), forecast.isCompleted(), forecast.isWinning()));
+                        forecastsHistory.add(new Forecast(forecast.getMatch(), forecast.getMinute(), forecast.getResult(), forecast.getCoefficient(), forecast.getBetSum(), forecast.isCompleted(), forecast.isWinning()));
                         forecast = null;
                     }
                 }
             }
         }
-
 
         ResultInfo resultInfo = new ResultInfo();
         resultInfo.setTotal(total);
