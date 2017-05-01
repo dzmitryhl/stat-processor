@@ -1,5 +1,7 @@
 package hello.dao;
 
+import hello.dto.request.ForecastRequestDTO;
+import hello.model.IntervalResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -30,5 +32,10 @@ public class ForecastDAOImpl implements ForecastDAO {
                 GET_MATCH_IDS_BY_PERIOD,
                 namedParameters,
                 (rs, rowNum) -> rs.getLong(1));
+    }
+
+    @Override
+    public IntervalResult applyStrategy(ForecastRequestDTO forecastRequestDTO) {
+        return null;
     }
 }

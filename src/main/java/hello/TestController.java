@@ -110,20 +110,20 @@ public class TestController {
 
 //                  + 204
 
-                    Result favoriteScored;
-                    Result outsiderScored;
+                    ResultExpectation favoriteScored;
+                    ResultExpectation outsiderScored;
 
                     if (row.getNextGoal1Coef() > row.getNextGoal2Coef()) {
-                        favoriteScored = Result.TEAM_2_SCORED;
-                        outsiderScored = Result.TEAM_1_SCORED;
+                        favoriteScored = ResultExpectation.TEAM_2_SCORED;
+                        outsiderScored = ResultExpectation.TEAM_1_SCORED;
 
                         favoriteCoefficient = row.getNextGoal2Coef();
                         outsiderCoefficient = row.getNextGoal1Coef();
                         favoriteScore = row.getScore2();
                         outsiderScore = row.getScore1();
                     } else {
-                        favoriteScored = Result.TEAM_1_SCORED;
-                        outsiderScored = Result.TEAM_2_SCORED;
+                        favoriteScored = ResultExpectation.TEAM_1_SCORED;
+                        outsiderScored = ResultExpectation.TEAM_2_SCORED;
                         favoriteCoefficient = row.getNextGoal1Coef();
                         outsiderCoefficient = row.getNextGoal2Coef();
                         favoriteScore = row.getScore1();
@@ -192,7 +192,7 @@ public class TestController {
 
 
 /*    @RequestMapping("/")
-    public ResultInfo getTest() {
+    public IntervalResult getTest() {
         List<Long> ids = this.jdbcTemplate.query(
                 GET_UNIQUE_IDS,
                 (rs, rowNum) -> rs.getLong(1));
@@ -234,21 +234,21 @@ public class TestController {
                     int favoriteScore = 0;
                     int outsiderScore = 0;
 
-                    Result favoriteScored = Result.TEAM_X_SCORED;
-                    Result outsiderScored = Result.TEAM_X_SCORED;
-                    Result noOneScored = Result.TEAM_X_SCORED;
+                    ResultExpectation favoriteScored = ResultExpectation.TEAM_X_SCORED;
+                    ResultExpectation outsiderScored = ResultExpectation.TEAM_X_SCORED;
+                    ResultExpectation noOneScored = ResultExpectation.TEAM_X_SCORED;
 
                     if (team1Favorite) {
-                        favoriteScored = Result.TEAM_1_SCORED;
-                        outsiderScored = Result.TEAM_2_SCORED;
+                        favoriteScored = ResultExpectation.TEAM_1_SCORED;
+                        outsiderScored = ResultExpectation.TEAM_2_SCORED;
                         favoriteCoefficient = row.getNextGoal1Coef();
                         outsiderCoefficient = row.getNextGoal2Coef();
                         noOneCoefficient = row.getNextGoalXCoef();
                         favoriteScore = row.getScore1();
                         outsiderScore = row.getScore2();
                     } else if (team2Favorite) {
-                        favoriteScored = Result.TEAM_2_SCORED;
-                        outsiderScored = Result.TEAM_1_SCORED;
+                        favoriteScored = ResultExpectation.TEAM_2_SCORED;
+                        outsiderScored = ResultExpectation.TEAM_1_SCORED;
                         favoriteCoefficient = row.getNextGoal2Coef();
                         outsiderCoefficient = row.getNextGoal1Coef();
                         noOneCoefficient = row.getNextGoalXCoef();
@@ -270,17 +270,17 @@ public class TestController {
 
                     if (forecast.isCompleted()) {
                         i = i - 1;
-                        forecastsHistory.add(new Forecast(forecast.getEventId(), forecast.getMinute(), forecast.getResult(), forecast.getCoefficient(), forecast.getBetSum(), forecast.isCompleted(), forecast.isWinning()));
+                        forecastsHistory.add(new Forecast(forecast.getEventId(), forecast.getMinute(), forecast.getResultExpectation(), forecast.getCoefficient(), forecast.getBetSum(), forecast.isCompleted(), forecast.isWinning()));
                         forecast = null;
                     } else if (row.getScoreTime() == 90) {
-                        forecastsHistory.add(new Forecast(forecast.getEventId(), forecast.getMinute(), forecast.getResult(), forecast.getCoefficient(), forecast.getBetSum(), forecast.isCompleted(), forecast.isWinning()));
+                        forecastsHistory.add(new Forecast(forecast.getEventId(), forecast.getMinute(), forecast.getResultExpectation(), forecast.getCoefficient(), forecast.getBetSum(), forecast.isCompleted(), forecast.isWinning()));
                         forecast = null;
                     }
                 }
             }
         }
 
-        ResultInfo resultInfo = new ResultInfo();
+        IntervalResult resultInfo = new IntervalResult();
         resultInfo.setTotal(total);
         resultInfo.setNumberOfBets(betNumber);
         resultInfo.setForecasts(forecastsHistory);

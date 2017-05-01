@@ -2,25 +2,25 @@ package hello.model;
 
 public class Forecast {
     private int minute;
-    private Result result;
+    private ResultExpectation resultExpectation;
     private double coefficient;
     private double betSum;
     private boolean isCompleted;
     private boolean isWinning;
     private Match match;
 
-    public Forecast(Match match, int minute, Result result, double coefficient, double betSum) {
+    public Forecast(Match match, int minute, ResultExpectation resultExpectation, double coefficient, double betSum) {
         this.match = match;
         this.minute = minute;
-        this.result = result;
+        this.resultExpectation = resultExpectation;
         this.coefficient = coefficient;
         this.betSum = betSum;
     }
 
-    public Forecast(Match match, int minute, Result result, double coefficient, double betSum, boolean isCompleted, boolean isWinning) {
+    public Forecast(Match match, int minute, ResultExpectation resultExpectation, double coefficient, double betSum, boolean isCompleted, boolean isWinning) {
         this.match = match;
         this.minute = minute;
-        this.result = result;
+        this.resultExpectation = resultExpectation;
         this.coefficient = coefficient;
         this.betSum = betSum;
         this.isCompleted = isCompleted;
@@ -35,12 +35,12 @@ public class Forecast {
         this.minute = minute;
     }
 
-    public Result getResult() {
-        return result;
+    public ResultExpectation getResultExpectation() {
+        return resultExpectation;
     }
 
-    public void setResult(Result result) {
-        this.result = result;
+    public void setResultExpectation(ResultExpectation resultExpectation) {
+        this.resultExpectation = resultExpectation;
     }
 
     public double getCoefficient() {
@@ -90,7 +90,7 @@ public class Forecast {
 
         if (row.isTeam1Scored()) {
             forecast.setCompleted(true);
-            if (forecast.getResult() == Result.TEAM_1_SCORED) {
+            if (forecast.getResultExpectation() == ResultExpectation.TEAM_1_SCORED) {
                 forecast.setWinning(true);
                 return forecast.getCoefficient() * forecast.getBetSum();
             } else {
@@ -99,14 +99,14 @@ public class Forecast {
             }
         } else if (row.isTeam2Scored()) {
             forecast.setCompleted(true);
-            if (forecast.getResult() == Result.TEAM_2_SCORED) {
+            if (forecast.getResultExpectation() == ResultExpectation.TEAM_2_SCORED) {
                 forecast.setWinning(true);
                 return forecast.getCoefficient() * forecast.getBetSum();
             } else {
                 forecast.setWinning(false);
                 return 0;
             }
-        } else if (row.getScoreTime() == 90 && forecast.getResult() == Result.TEAM_X_SCORED) {
+        } else if (row.getScoreTime() == 90 && forecast.getResultExpectation() == ResultExpectation.TEAM_X_SCORED) {
             forecast.setCompleted(true);
             forecast.setWinning(true);
             return forecast.getCoefficient() * forecast.getBetSum();

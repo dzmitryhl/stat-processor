@@ -1,21 +1,14 @@
 package hello.controller;
 
 import hello.dto.ResultCandidateDto;
-import hello.dto.ResultTempDto;
+import hello.dto.request.MatchResultRequestDTO;
 import hello.model.*;
 import hello.service.MatchService;
-import org.omg.CosNaming.NamingContextExtPackage.StringNameHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.web.bind.annotation.*;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.*;
 

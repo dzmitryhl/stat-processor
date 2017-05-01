@@ -1,4 +1,4 @@
-package hello.model;
+package hello.dto.request;
 
 import java.util.Date;
 
@@ -6,7 +6,6 @@ public class MatchResultRequestDTO {
     private Date startDate;
     private Date endDate;
     private boolean uncompletedOnly;
-
 
     public boolean isUncompletedOnly() {
         return uncompletedOnly;

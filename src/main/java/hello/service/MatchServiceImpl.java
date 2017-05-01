@@ -25,6 +25,11 @@ public class MatchServiceImpl implements MatchService {
     }
 
     @Override
+    public List<Long> getMatchIds(Timestamp startDate, Timestamp endDate) {
+        return matchDAO.getMatchIds(startDate, endDate, false);
+    }
+
+    @Override
     public Match getMatchById(Long id) {
         return matchDAO.getMatchById(id);
     }

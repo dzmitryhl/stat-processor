@@ -21,7 +21,7 @@ public class MatchDAOImpl implements MatchDAO {
     @Autowired
     NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
-    private String GET_MATCH_IDS = "select m.id from matches m left join details d on d.id = m.id where d.score_time = 90 and planned_kickoff_date >= :startDate and planned_kickoff_date <= :endDate";
+    private String GET_MATCH_IDS = "select m.id from matches m left join details d on d.id = m.id where d.score_time = 90 and coalesce(planned_kickoff_date, actual_kickoff_date) > :startDate and coalesce(planned_kickoff_date, actual_kickoff_date) <= :endDate";
     private String GET_MATCH_BY_ID = "select id, sport_name, location, championship, home_team, away_team, planned_kickoff_date, actual_kickoff_date, initially_completed, score_confirmed from matches where id = :id";
     private String GET_DETAIL_BY_ID = "select id, score_time, score1, score2, next_goal_1_coef, next_goal_x_coef, next_goal_2_coef, team_1_scored, team_2_scored, reconstructed from details where id = :id and score_time = :score_time";
     private String GET_DETAILS_BY_ID = "select id, score_time, score1, score2, next_goal_1_coef, next_goal_x_coef, next_goal_2_coef, team_1_scored, team_2_scored, reconstructed from details where id = :id";

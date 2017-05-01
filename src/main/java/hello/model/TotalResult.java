@@ -1,11 +1,16 @@
 package hello.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class ResultInfo {
+public class TotalResult {
     double total;
     int numberOfBets;
-    List<Forecast> forecasts;
+    List<IntervalResult> intervalResults;
+
+    public TotalResult() {
+        this.intervalResults = new ArrayList<>();
+    }
 
     public double getTotal() {
         return total;
@@ -23,11 +28,11 @@ public class ResultInfo {
         this.numberOfBets = numberOfBets;
     }
 
-    public List<Forecast> getForecasts() {
-        return forecasts;
+    public List<IntervalResult> getIntervalResults() {
+        return intervalResults;
     }
 
-    public void setForecasts(List<Forecast> forecasts) {
-        this.forecasts = forecasts;
+    public void setIntervalResults(List<IntervalResult> intervalResults) {
+        this.intervalResults = intervalResults;
     }
 }

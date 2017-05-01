@@ -12,6 +12,7 @@ import java.util.List;
 
 public interface MatchService {
     List<Long> getMatchIds(Timestamp startDate, Timestamp endDate, boolean uncompletedOnly);
+    List<Long> getMatchIds(Timestamp startDate, Timestamp endDate);
     Match getMatchById(Long id);
     StatisticsRowHolder getDetail(Long matchId, int scoreTime);
     List<StatisticsRowHolder> getDetails(Long matchId);

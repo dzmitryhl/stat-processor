@@ -19,6 +19,22 @@ public class Match {
     private Timestamp actualKickoffDate;
     private List<ResultCandidateDto> resultCandidates;
 
+    public Match() {}
+
+    public Match(Match match) {
+        this.id = match.getId();
+        this.sportName = match.getSportName();
+        this.homeTeam = match.getHomeTeam();
+        this.awayTeam = match.getAwayTeam();
+        this.location = match.getLocation();
+        this.championship = match.getChampionship();
+        this.initiallyCompleted = match.isInitiallyCompleted();
+        this.details = match.getDetails();
+        this.plannedKickoffDate = match.getPlannedKickoffDate();
+        this.actualKickoffDate = match.getActualKickoffDate();
+        this.resultCandidates = match.getResultCandidates();
+    }
+
     public List<ResultCandidateDto> getResultCandidates() {
         return resultCandidates;
     }
