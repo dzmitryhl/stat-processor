@@ -10,7 +10,9 @@ import java.sql.Timestamp;
 import java.util.List;
 
 public interface MatchDAO {
-    List<Long> getMatchIds(Timestamp startDate, Timestamp endDate, boolean uncompletedOnly);
+    List<Long> getMatchIds(Timestamp startDate, Timestamp endDate, boolean notConfirmed);
+    List<Long> getRandomMatchIds(long number);
+    List<Long> getAllMatchIds();
     Match getMatchById(Long id);
     StatisticsRowHolder getDetail(Long matchId, int scoreTime);
     List<StatisticsRowHolder> getDetails(Long matchId);
@@ -31,4 +33,7 @@ public interface MatchDAO {
     void saveDetail(StatisticsRowHolder detail);
 
     void savePeriod(Period period);
+
+    void updateScoreConfirmed(long matchId, boolean confirmed);
+    void updateMatchResult(long matchId, int homeTeamScore, int awayTeamScore);
 }

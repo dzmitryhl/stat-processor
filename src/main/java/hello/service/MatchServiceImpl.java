@@ -20,13 +20,23 @@ public class MatchServiceImpl implements MatchService {
 
 
     @Override
-    public List<Long> getMatchIds(Timestamp startDate, Timestamp endDate, boolean uncompletedOnly) {
-        return matchDAO.getMatchIds(startDate, endDate, uncompletedOnly);
+    public List<Long> getMatchIds(Timestamp startDate, Timestamp endDate, boolean notConfirmed) {
+        return matchDAO.getMatchIds(startDate, endDate, notConfirmed);
     }
 
     @Override
     public List<Long> getMatchIds(Timestamp startDate, Timestamp endDate) {
         return matchDAO.getMatchIds(startDate, endDate, false);
+    }
+
+    @Override
+    public List<Long> getRandomMatchIds(long number) {
+        return matchDAO.getRandomMatchIds(number);
+    }
+
+    @Override
+    public List<Long> getAllMatchIds() {
+        return matchDAO.getAllMatchIds();
     }
 
     @Override
@@ -91,4 +101,17 @@ public class MatchServiceImpl implements MatchService {
     public void savePeriod(Period period) {
 
     }
+
+    @Override
+    public void updateScoreConfirmed(long matchId, boolean confirmed) {
+        matchDAO.updateScoreConfirmed(matchId, confirmed);
+    }
+
+    @Override
+    public void updateMatchResult(long matchId, int homeTeamScore, int awayTeamScore) {
+        matchDAO.updateMatchResult(matchId, homeTeamScore, awayTeamScore);
+        matchDAO.updateScoreConfirmed(matchId, true);
+    }
+
+
 }

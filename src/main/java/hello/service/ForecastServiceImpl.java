@@ -32,128 +32,136 @@ public class ForecastServiceImpl implements ForecastService {
 
         TotalResult totalResult = new TotalResult();
 
-        for (Interval interval : forecastRequestDTO.getIntervals()) {
+        double intervalTotal = 10;
+        int intervalBetNumber = 0;
 
-            double intervalTotal = 10;
-            int intervalBetNumber = 0;
+        Interval interval = forecastRequestDTO.getInterval();
 
-            List<Long> ids = matchService.getMatchIds(interval.getStartDate(), interval.getEndDate());
+        List<Long> ids;
+        if (interval != null && interval.getStartDate() != null && interval.getEndDate() != null) {
+            ids = matchService.getMatchIds(interval.getStartDate(), interval.getEndDate());
+        } else if (forecastRequestDTO.getLoadNRandom() != 0) {
+            ids = matchService.getRandomMatchIds(forecastRequestDTO.getLoadNRandom());
+        } else {
+            ids = matchService.getAllMatchIds();
+        }
 
-            List<Forecast> forecastsHistory = new ArrayList<>();
+        List<Forecast> forecastsHistory = new ArrayList<>();
+        StrategyType strategyType = forecastRequestDTO.getStrategyType();
 
-            RequestResultExpectation requestResultExpectation = forecastRequestDTO.getRequestResultExpectation();
+        for(Long id : ids) {
+            Match match = matchService.getMatchById(id);
+            match.setDetails(matchService.getDetails(match.getId()));
 
-            for(Long id : ids) {
-                Match match = matchService.getMatchById(id);
-                match.setDetails(matchService.getDetails(match.getId()));
+            Forecast forecast = null;
 
-                Forecast forecast = null;
+            for (int i = 0; i < match.getDetails().size(); i++) {
+                StatisticsRowHolder row = match.getDetails().get(i);
+                if (forecast == null) {
 
-                for (int i = 0; i < match.getDetails().size(); i++) {
-                    StatisticsRowHolder row = match.getDetails().get(i);
-                    if (forecast == null) {
+                    int scoreTime = row.getScoreTime();
 
-                        int scoreTime = row.getScoreTime();
+                    double favoriteCoefficient;
+                    double outsiderCoefficient;
 
-                        double favoriteCoefficient;
-                        double outsiderCoefficient;
+                    int favoriteScore;
+                    int outsiderScore;
 
-                        int favoriteScore;
-                        int outsiderScore;
+                    ResultExpectation resultExpectation;
 
-                        ResultExpectation resultExpectation;
+                    if (strategyType == StrategyType.FAVORITE_SCORED) {
 
-                        if (requestResultExpectation == RequestResultExpectation.FAVORITE_SCORED) {
-                            if (row.getNextGoal1Coef() > row.getNextGoal2Coef()) {
-                                resultExpectation = ResultExpectation.TEAM_2_SCORED;
-                                favoriteCoefficient = row.getNextGoal2Coef();
-                                outsiderCoefficient = row.getNextGoal1Coef();
-                                favoriteScore = row.getScore2();
-                                outsiderScore = row.getScore1();
-                            } else {
-                                resultExpectation = ResultExpectation.TEAM_1_SCORED;
-                                favoriteCoefficient = row.getNextGoal1Coef();
-                                outsiderCoefficient = row.getNextGoal2Coef();
-                                favoriteScore = row.getScore1();
-                                outsiderScore = row.getScore2();
-                            }
-
-                            if (favoriteCoefficient > forecastRequestDTO.getPlayTeamMinCoefficient() &&
-                                    scoreTime > forecastRequestDTO.getScoreTimeMin() &&
-                                    scoreTime < forecastRequestDTO.getScoreTimeMax() &&
-                                    favoriteScore == forecastRequestDTO.getPlayTeamMinScore() &&
-                                    outsiderScore == forecastRequestDTO.getOtherTeamMinScore()) {
-                                forecast = new Forecast(match, scoreTime, resultExpectation, favoriteCoefficient, betSum);
-                                intervalTotal -= betSum;
-                                intervalBetNumber++;
-                            }
-
-                        } else if (requestResultExpectation == RequestResultExpectation.OUTSIDER_SCORED) {
-                            if (row.getNextGoal1Coef() > row.getNextGoal2Coef()) {
-                                resultExpectation = ResultExpectation.TEAM_1_SCORED;
-                                favoriteCoefficient = row.getNextGoal2Coef();
-                                outsiderCoefficient = row.getNextGoal1Coef();
-                                favoriteScore = row.getScore2();
-                                outsiderScore = row.getScore1();
-                            } else {
-                                resultExpectation = ResultExpectation.TEAM_2_SCORED;
-                                favoriteCoefficient = row.getNextGoal1Coef();
-                                outsiderCoefficient = row.getNextGoal2Coef();
-                                favoriteScore = row.getScore1();
-                                outsiderScore = row.getScore2();
-                            }
+                        if (row.getNextGoal1Coef() > row.getNextGoal2Coef()) {
+                            resultExpectation = ResultExpectation.TEAM_2_SCORED;
+                            favoriteCoefficient = row.getNextGoal2Coef();
+                            outsiderCoefficient = row.getNextGoal1Coef();
+                            favoriteScore = row.getScore2();
+                            outsiderScore = row.getScore1();
                         } else {
-                            resultExpectation = ResultExpectation.TEAM_X_SCORED;
-                            favoriteCoefficient = row.getNextGoal1Coef() > row.getNextGoal2Coef() ? row.getNextGoal2Coef() : row.getNextGoal1Coef();
-                            outsiderCoefficient = row.getNextGoal1Coef() > row.getNextGoal2Coef() ? row.getNextGoal1Coef() : row.getNextGoal2Coef();
-                            favoriteScore = row.getNextGoal1Coef() > row.getNextGoal2Coef() ? row.getScore2() : row.getScore1();
-                            outsiderScore = row.getNextGoal1Coef() > row.getNextGoal2Coef() ? row.getScore1() : row.getScore2();
+                            resultExpectation = ResultExpectation.TEAM_1_SCORED;
+                            favoriteCoefficient = row.getNextGoal1Coef();
+                            outsiderCoefficient = row.getNextGoal2Coef();
+                            favoriteScore = row.getScore1();
+                            outsiderScore = row.getScore2();
                         }
 
+                        boolean satisfyConditions;
+                        satisfyConditions = forecastRequestDTO.getFavoriteCoefficientMin() == null || favoriteCoefficient > forecastRequestDTO.getFavoriteCoefficientMin();
+                        satisfyConditions = satisfyConditions && (forecastRequestDTO.getTimeMin() == null || scoreTime > forecastRequestDTO.getTimeMin());
+                        satisfyConditions = satisfyConditions && (forecastRequestDTO.getTimeMax() == null || scoreTime < forecastRequestDTO.getTimeMax());
+                        satisfyConditions = satisfyConditions && (forecastRequestDTO.getFavoriteScoreMin() == null || favoriteScore == forecastRequestDTO.getFavoriteScoreMin());
+                        satisfyConditions = satisfyConditions && (forecastRequestDTO.getOutsiderScoreMin() == null || outsiderScore == forecastRequestDTO.getOutsiderScoreMin());
+
+                        if (satisfyConditions) {
+                            forecast = new Forecast(match, scoreTime, resultExpectation, favoriteCoefficient, betSum);
+                            intervalTotal -= betSum;
+                            intervalBetNumber++;
+                        }
+
+                    } else if (strategyType == StrategyType.OUTSIDER_SCORED) {
+                        if (row.getNextGoal1Coef() > row.getNextGoal2Coef()) {
+                            resultExpectation = ResultExpectation.TEAM_1_SCORED;
+                            favoriteCoefficient = row.getNextGoal2Coef();
+                            outsiderCoefficient = row.getNextGoal1Coef();
+                            favoriteScore = row.getScore2();
+                            outsiderScore = row.getScore1();
+                        } else {
+                            resultExpectation = ResultExpectation.TEAM_2_SCORED;
+                            favoriteCoefficient = row.getNextGoal1Coef();
+                            outsiderCoefficient = row.getNextGoal2Coef();
+                            favoriteScore = row.getScore1();
+                            outsiderScore = row.getScore2();
+                        }
                     } else {
-                        double increment = forecast.check(row.getScoreTime());
+                        resultExpectation = ResultExpectation.TEAM_X_SCORED;
+                        favoriteCoefficient = row.getNextGoal1Coef() > row.getNextGoal2Coef() ? row.getNextGoal2Coef() : row.getNextGoal1Coef();
+                        outsiderCoefficient = row.getNextGoal1Coef() > row.getNextGoal2Coef() ? row.getNextGoal1Coef() : row.getNextGoal2Coef();
+                        favoriteScore = row.getNextGoal1Coef() > row.getNextGoal2Coef() ? row.getScore2() : row.getScore1();
+                        outsiderScore = row.getNextGoal1Coef() > row.getNextGoal2Coef() ? row.getScore1() : row.getScore2();
+                    }
 
-                        intervalTotal += increment;
+                } else {
+                    double increment = forecast.check(row.getScoreTime());
 
-                        if (forecast.isCompleted()) {
-                            i = i - 1;
-                            Match matchClone = new Match(match);
+                    intervalTotal += increment;
 
-                            if (!forecastRequestDTO.isShowDetails()) {
-                                matchClone.setDetails(null);
-                            }
+                    if (forecast.isCompleted()) {
+                        i = i - 1;
+                        Match matchClone = new Match(match);
 
-                            forecastsHistory.add(new Forecast(matchClone, forecast.getMinute(), forecast.getResultExpectation(), forecast.getCoefficient(), forecast.getBetSum(), forecast.isCompleted(), forecast.isWinning()));
-                            forecast = null;
-                        } else if (row.getScoreTime() == 90) {
-                            //forecast.setCompleted(true);
-                            Match matchClone = new Match(match);
-                            if (!forecastRequestDTO.isShowDetails()) {
-                                matchClone.setDetails(null);
-                            }
-                            forecastsHistory.add(new Forecast(matchClone, forecast.getMinute(), forecast.getResultExpectation(), forecast.getCoefficient(), forecast.getBetSum(), forecast.isCompleted(), forecast.isWinning()));
-                            forecast = null;
+                        if (!forecastRequestDTO.isShowDetails()) {
+                            matchClone.setDetails(null);
                         }
+
+                        forecastsHistory.add(new Forecast(matchClone, forecast.getMinute(), forecast.getResultExpectation(), forecast.getCoefficient(), forecast.getBetSum(), forecast.isCompleted(), forecast.isWinning()));
+                        forecast = null;
+                    } else if (row.getScoreTime() == 90) {
+                        //forecast.setCompleted(true);
+                        Match matchClone = new Match(match);
+                        if (!forecastRequestDTO.isShowDetails()) {
+                            matchClone.setDetails(null);
+                        }
+                        forecastsHistory.add(new Forecast(matchClone, forecast.getMinute(), forecast.getResultExpectation(), forecast.getCoefficient(), forecast.getBetSum(), forecast.isCompleted(), forecast.isWinning()));
+                        forecast = null;
                     }
                 }
             }
-
-            IntervalResult intervalResult = new IntervalResult();
-            intervalResult.setTotal(intervalTotal);
-            intervalResult.setNumberOfBets(intervalBetNumber);
-
-            intervalResult.setForecasts(null);
-
-            if (forecastRequestDTO.isShowHistory()) {
-                intervalResult.setForecasts(forecastsHistory);
-            }
-
-            totalResult.getIntervalResults().add(intervalResult);
-
-            total += intervalTotal;
-            betNumber += intervalBetNumber;
-
         }
+
+        IntervalResult intervalResult = new IntervalResult();
+        intervalResult.setTotal(intervalTotal);
+        intervalResult.setNumberOfBets(intervalBetNumber);
+
+        intervalResult.setForecasts(null);
+
+        if (forecastRequestDTO.isShowHistory()) {
+            intervalResult.setForecasts(forecastsHistory);
+        }
+
+        totalResult.getPartialResults().add(intervalResult);
+
+        total += intervalTotal;
+        betNumber += intervalBetNumber;
 
         totalResult.setTotal(total);
         totalResult.setNumberOfBets(betNumber);

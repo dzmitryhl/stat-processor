@@ -2,6 +2,7 @@ package hello.controller;
 
 import hello.dto.ResultCandidateDto;
 import hello.dto.request.MatchResultRequestDTO;
+import hello.dto.request.UpdateMatchResultRequestDTO;
 import hello.model.*;
 import hello.service.MatchService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +27,7 @@ public class DataImportController {
         Timestamp startDate = new Timestamp(matchResultRequestDTO.getStartDate().getTime());
         Timestamp endDate = new Timestamp(matchResultRequestDTO.getEndDate().getTime());
 
-        List<Long> ids = matchService.getMatchIds(startDate, endDate, matchResultRequestDTO.isUncompletedOnly());
+        List<Long> ids = matchService.getMatchIds(startDate, endDate, true);
 
         for (long id : ids) {
 
@@ -46,6 +47,17 @@ public class DataImportController {
 
         return ResponseEntity.status(HttpStatus.OK).body(notConfirmedScore);
     }
+
+
+
+    @CrossOrigin(origins = "http://localhost:4200")
+    @RequestMapping(value = "/updateMatchResult", method = RequestMethod.POST)
+    public ResponseEntity updateMatchResult(@RequestBody UpdateMatchResultRequestDTO updateMatchResultRequestDTO) {
+        matchService.updateMatchResult(updateMatchResultRequestDTO.getMatchId(), updateMatchResultRequestDTO.getHomeTeamScore(), updateMatchResultRequestDTO.getAwayTeamScore());
+        return ResponseEntity.status(HttpStatus.OK).body(null);
+    }
+
+
 
     @CrossOrigin(origins = "http://localhost:4200")
     @RequestMapping(value = "/startDataImport", method = RequestMethod.POST)
@@ -98,6 +110,11 @@ public class DataImportController {
             List<RowHolder> matchRows = matchService.getMatchRows(id);
             Match match = convertToMatch(matchRows);
             matchService.saveMatch(match);
+
+            List<ResultCandidateDto> resultCandidateDtoList = matchService.getResultCandidates(id);
+            checkAndModifyMatchResult(match, resultCandidateDtoList);
+
+            matchService.updateScoreConfirmed(match.getId(), match.isScoreConfirmed());
         }
 
         Timestamp newlyAddedMatchTimestamp = matchService.getLastAddedMatchTimestamp();

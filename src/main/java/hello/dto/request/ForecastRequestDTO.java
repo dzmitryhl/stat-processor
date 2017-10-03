@@ -1,135 +1,161 @@
 package hello.dto.request;
 
 import hello.model.Interval;
-import hello.model.RequestResultExpectation;
-
-import java.sql.Timestamp;
-import java.util.List;
+import hello.model.StrategyType;
 
 public class ForecastRequestDTO {
-    private long periodId;
-    private RequestResultExpectation requestResultExpectation;
-    private long playTeamMinScore;
-    private long playTeamMaxScore;
-    private double playTeamMinCoefficient;
-    private double playTeamMaxCoefficient;
-    private long otherTeamMinScore;
-    private long otherTeamMaxScore;
-    private double otherTeamMinCoefficient;
-    private double otherTeamMaxCoefficient;
-    private int scoreTimeMin;
-    private int scoreTimeMax;
+    private Long periodId;
+    private StrategyType strategyType;
+    private Long favoriteScoreMin;
+    private Long favoriteScoreMax;
+    private Double favoriteCoefficientMin;
+    private Double favoriteCoefficientMax;
+    private Long outsiderScoreMin;
+    private Long outsiderScoreMax;
+    private Double outsiderCoefficientMin;
+    private Double outsiderCoefficientMax;
+    private Integer timeMin;
+    private Integer timeMax;
     private boolean showHistory;
     private boolean showDetails;
-    private List<Interval> intervals;
 
-    public long getPeriodId() {
+    private boolean loadAll;
+    private Integer loadNRandom;
+    private Interval interval;
+
+    public boolean isLoadAll() {
+        return loadAll;
+    }
+
+    public void setLoadAll(boolean loadAll) {
+        this.loadAll = loadAll;
+    }
+
+    public Integer getLoadNRandom() {
+        return loadNRandom;
+    }
+
+    public void setLoadNRandom(Integer loadNRandom) {
+        this.loadNRandom = loadNRandom;
+    }
+
+    public Interval getInterval() {
+        return interval;
+    }
+
+    public void setInterval(Interval interval) {
+        this.interval = interval;
+    }
+
+    //    private List<Interval> intervals;
+
+    public Long getPeriodId() {
         return periodId;
     }
 
-    public void setPeriodId(long periodId) {
+    public void setPeriodId(Long periodId) {
         this.periodId = periodId;
     }
 
-    public void setResultExpectation(RequestResultExpectation requestResultExpectation) {
-        this.requestResultExpectation = requestResultExpectation;
+    public void setResultExpectation(StrategyType strategyType) {
+        this.strategyType = strategyType;
     }
 
-    public RequestResultExpectation getRequestResultExpectation() {
-        return requestResultExpectation;
+    public StrategyType getStrategyType() {
+        return strategyType;
     }
 
-    public void setRequestResultExpectation(RequestResultExpectation requestResultExpectation) {
-        this.requestResultExpectation = requestResultExpectation;
+    public void setStrategyType(StrategyType strategyType) {
+        this.strategyType = strategyType;
     }
 
-    public long getPlayTeamMinScore() {
-        return playTeamMinScore;
+    public Long getFavoriteScoreMin() {
+        return favoriteScoreMin;
     }
 
-    public void setPlayTeamMinScore(long playTeamMinScore) {
-        this.playTeamMinScore = playTeamMinScore;
+    public void setFavoriteScoreMin(Long favoriteScoreMin) {
+        this.favoriteScoreMin = favoriteScoreMin;
     }
 
-    public double getPlayTeamMinCoefficient() {
-        return playTeamMinCoefficient;
+    public Double getFavoriteCoefficientMin() {
+        return favoriteCoefficientMin;
     }
 
-    public void setPlayTeamMinCoefficient(double playTeamMinCoefficient) {
-        this.playTeamMinCoefficient = playTeamMinCoefficient;
+    public void setFavoriteCoefficientMin(Double favoriteCoefficientMin) {
+        this.favoriteCoefficientMin = favoriteCoefficientMin;
     }
 
-    public long getOtherTeamMinScore() {
-        return otherTeamMinScore;
+    public Long getOutsiderScoreMin() {
+        return outsiderScoreMin;
     }
 
-    public void setOtherTeamMinScore(long otherTeamMinScore) {
-        this.otherTeamMinScore = otherTeamMinScore;
+    public void setOutsiderScoreMin(Long outsiderScoreMin) {
+        this.outsiderScoreMin = outsiderScoreMin;
     }
 
-    public double getOtherTeamMinCoefficient() {
-        return otherTeamMinCoefficient;
+    public Double getOutsiderCoefficientMin() {
+        return outsiderCoefficientMin;
     }
 
-    public void setOtherTeamMinCoefficient(double otherTeamMinCoefficient) {
-        this.otherTeamMinCoefficient = otherTeamMinCoefficient;
+    public void setOutsiderCoefficientMin(Double outsiderCoefficientMin) {
+        this.outsiderCoefficientMin = outsiderCoefficientMin;
     }
 
-    public int getScoreTimeMin() {
-        return scoreTimeMin;
+    public Integer getTimeMin() {
+        return timeMin;
     }
 
-    public void setScoreTimeMin(int scoreTimeMin) {
-        this.scoreTimeMin = scoreTimeMin;
+    public void setTimeMin(Integer timeMin) {
+        this.timeMin = timeMin;
     }
 
-    public int getScoreTimeMax() {
-        return scoreTimeMax;
+    public Integer getTimeMax() {
+        return timeMax;
     }
 
-    public void setScoreTimeMax(int scoreTimeMax) {
-        this.scoreTimeMax = scoreTimeMax;
+    public void setTimeMax(Integer timeMax) {
+        this.timeMax = timeMax;
     }
 
-    public long getPlayTeamMaxScore() {
-        return playTeamMaxScore;
+    public Long getFavoriteScoreMax() {
+        return favoriteScoreMax;
     }
 
-    public void setPlayTeamMaxScore(long playTeamMaxScore) {
-        this.playTeamMaxScore = playTeamMaxScore;
+    public void setFavoriteScoreMax(Long favoriteScoreMax) {
+        this.favoriteScoreMax = favoriteScoreMax;
     }
 
-    public double getPlayTeamMaxCoefficient() {
-        return playTeamMaxCoefficient;
+    public Double getFavoriteCoefficientMax() {
+        return favoriteCoefficientMax;
     }
 
-    public void setPlayTeamMaxCoefficient(double playTeamMaxCoefficient) {
-        this.playTeamMaxCoefficient = playTeamMaxCoefficient;
+    public void setFavoriteCoefficientMax(Double favoriteCoefficientMax) {
+        this.favoriteCoefficientMax = favoriteCoefficientMax;
     }
 
-    public long getOtherTeamMaxScore() {
-        return otherTeamMaxScore;
+    public Long getOutsiderScoreMax() {
+        return outsiderScoreMax;
     }
 
-    public void setOtherTeamMaxScore(long otherTeamMaxScore) {
-        this.otherTeamMaxScore = otherTeamMaxScore;
+    public void setOutsiderScoreMax(Long outsiderScoreMax) {
+        this.outsiderScoreMax = outsiderScoreMax;
     }
 
-    public double getOtherTeamMaxCoefficient() {
-        return otherTeamMaxCoefficient;
+    public Double getOutsiderCoefficientMax() {
+        return outsiderCoefficientMax;
     }
 
-    public void setOtherTeamMaxCoefficient(double otherTeamMaxCoefficient) {
-        this.otherTeamMaxCoefficient = otherTeamMaxCoefficient;
+    public void setOutsiderCoefficientMax(Double outsiderCoefficientMax) {
+        this.outsiderCoefficientMax = outsiderCoefficientMax;
     }
 
-    public List<Interval> getIntervals() {
-        return intervals;
-    }
-
-    public void setIntervals(List<Interval> intervals) {
-        this.intervals = intervals;
-    }
+//    public List<Interval> getIntervals() {
+//        return intervals;
+//    }
+//
+//    public void setIntervals(List<Interval> intervals) {
+//        this.intervals = intervals;
+//    }
 
     public boolean isShowHistory() {
         return showHistory;

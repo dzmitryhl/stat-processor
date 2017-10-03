@@ -11,6 +11,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +23,8 @@ public class MatchDAOImpl implements MatchDAO {
     NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
     private String GET_MATCH_IDS = "select m.id from matches m left join details d on d.id = m.id where d.score_time = 90 and coalesce(planned_kickoff_date, actual_kickoff_date) > :startDate and coalesce(planned_kickoff_date, actual_kickoff_date) <= :endDate";
+    private String GET_RANDOM_MATCH_IDS = "select m.id from matches m left join details d on d.id = m.id where d.score_time = 90 order by random() limit :limit";
+    private String GET_ALL_MATCH_IDS = "select m.id from matches m left join details d on d.id = m.id where d.score_time = 90";
     private String GET_MATCH_BY_ID = "select id, sport_name, location, championship, home_team, away_team, planned_kickoff_date, actual_kickoff_date, initially_completed, score_confirmed from matches where id = :id";
     private String GET_DETAIL_BY_ID = "select id, score_time, score1, score2, next_goal_1_coef, next_goal_x_coef, next_goal_2_coef, team_1_scored, team_2_scored, reconstructed from details where id = :id and score_time = :score_time";
     private String GET_DETAILS_BY_ID = "select id, score_time, score1, score2, next_goal_1_coef, next_goal_x_coef, next_goal_2_coef, team_1_scored, team_2_scored, reconstructed from details where id = :id";
@@ -50,16 +53,35 @@ public class MatchDAOImpl implements MatchDAO {
     private static String SAVE_DETAIL = "insert into details (id, score_time, score1, score2, next_goal_1_coef, next_goal_x_coef, next_goal_2_coef, team_1_scored, team_2_scored, reconstructed) values (:id, :score_time, :score1, :score2, :next_goal_1_coef, :next_goal_x_coef, :next_goal_2_coef, :team_1_scored, :team_2_scored, :reconstructed)";
     private static String SAVE_PERIOD = "insert into periods (name, \"from\", \"to\") values (:name, :from, :to)";
 
+    private static String UPDATE_SCORE_CONFIRMED = "update matches set score_confirmed = :score_confirmed where id = :match_id";
+    private static String UPDATE_MATCH_RESULT = "update details set score1 = :home_team_score, score2 = :away_team_score where id = :match_id and score_time = 90";
 
     @Override
-    public List<Long> getMatchIds(Timestamp startDate, Timestamp endDate, boolean uncompletedOnly) {
+    public List<Long> getMatchIds(Timestamp startDate, Timestamp endDate, boolean notConfirmed) {
         MapSqlParameterSource namedParameters = new MapSqlParameterSource();
         namedParameters.addValue("startDate", startDate);
         namedParameters.addValue("endDate", endDate);
 
         return this.namedParameterJdbcTemplate.query(
-                uncompletedOnly ? GET_MATCH_IDS + " and d.reconstructed = true" : GET_MATCH_IDS,
+                notConfirmed ? GET_MATCH_IDS + " and m.score_confirmed <> true" : GET_MATCH_IDS,
                 namedParameters,
+                (rs, rowNum) -> rs.getLong(1));
+    }
+
+    @Override
+    public List<Long> getRandomMatchIds(long limit) {
+        MapSqlParameterSource namedParameters = new MapSqlParameterSource();
+        namedParameters.addValue("limit", limit);
+        return this.namedParameterJdbcTemplate.query(
+                GET_RANDOM_MATCH_IDS,
+                namedParameters,
+                (rs, rowNum) -> rs.getLong(1));
+    }
+
+    @Override
+    public List<Long> getAllMatchIds() {
+        return this.namedParameterJdbcTemplate.query(
+                GET_ALL_MATCH_IDS,
                 (rs, rowNum) -> rs.getLong(1));
     }
 
@@ -290,7 +312,7 @@ public class MatchDAOImpl implements MatchDAO {
         namedParameters.addValue("planned_kickoff_date", match.getPlannedKickoffDate());
         namedParameters.addValue("actual_kickoff_date", match.getActualKickoffDate());
         namedParameters.addValue("initially_completed", match.isInitiallyCompleted());
-        namedParameters.addValue("score_confirmed", false);
+        namedParameters.addValue("score_confirmed", match.isScoreConfirmed());
 
         namedParameterJdbcTemplate.update(
                 SAVE_MATCH,
@@ -355,5 +377,33 @@ public class MatchDAOImpl implements MatchDAO {
         resultMap.put("score2", score2);
 
         return resultMap;
+    }
+
+    @Override
+    public void updateScoreConfirmed(long matchId, boolean confirmed) {
+        MapSqlParameterSource namedParameters = new MapSqlParameterSource();
+
+        namedParameters.addValue("match_id", matchId);
+        namedParameters.addValue("score_confirmed", confirmed);
+
+        namedParameterJdbcTemplate.update(
+                UPDATE_SCORE_CONFIRMED,
+                namedParameters
+        );
+    }
+
+    @Override
+    public void updateMatchResult(long matchId, int homeTeamScore, int awayTeamScore) {
+        MapSqlParameterSource namedParameters = new MapSqlParameterSource();
+
+        namedParameters.addValue("match_id", matchId);
+        namedParameters.addValue("home_team_score", homeTeamScore);
+        namedParameters.addValue("away_team_score", awayTeamScore);
+
+        namedParameterJdbcTemplate.update(
+                UPDATE_MATCH_RESULT,
+                namedParameters
+        );
+
     }
 }

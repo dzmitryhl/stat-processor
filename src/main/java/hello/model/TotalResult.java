@@ -6,10 +6,10 @@ import java.util.List;
 public class TotalResult {
     double total;
     int numberOfBets;
-    List<IntervalResult> intervalResults;
+    List<IntervalResult> partialResults;
 
     public TotalResult() {
-        this.intervalResults = new ArrayList<>();
+        this.partialResults = new ArrayList<>();
     }
 
     public double getTotal() {
@@ -28,11 +28,11 @@ public class TotalResult {
         this.numberOfBets = numberOfBets;
     }
 
-    public List<IntervalResult> getIntervalResults() {
-        return intervalResults;
+    public List<IntervalResult> getPartialResults() {
+        return partialResults;
     }
 
-    public void setIntervalResults(List<IntervalResult> intervalResults) {
-        this.intervalResults = intervalResults;
+    public void setPartialResults(List<IntervalResult> partialResults) {
+        this.partialResults = partialResults;
     }
 }
